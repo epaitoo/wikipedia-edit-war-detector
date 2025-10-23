@@ -8,7 +8,7 @@
 		<version>3.5.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.eugene</groupId>
+	<groupId>com.epaitoo</groupId>
 	<artifactId>springboot-kafka-realtime</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>springboot-kafka-realtime</name>
