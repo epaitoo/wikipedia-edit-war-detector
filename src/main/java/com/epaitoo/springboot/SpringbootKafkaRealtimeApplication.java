@@ -1,4 +1,4 @@
-package com.eugene.springboot;
+package com.epaitoo.springboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
