@@ -1,12 +1,11 @@
-package com.epaitoo.springboot;
+package com.epaitoo.springboot.controller;
 
+import com.epaitoo.springboot.ApiEventListener;
+import com.epaitoo.springboot.ApiRealTImeChangesConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-
-import java.util.function.Consumer;
 
 @RestController
 public class ApiRealTimeChangesController {

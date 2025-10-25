@@ -19,17 +19,18 @@ public class ApiRealTImeChangesHandler implements BackgroundEventHandler {
     }
     @Override
     public void onOpen() throws Exception {
-
+        LOGGER.info("✅ Connection to Wikimedia OPENED!");
     }
 
     @Override
     public void onClosed() throws Exception {
-
+        LOGGER.info("❌ Connection to Wikimedia CLOSED");
     }
 
     @Override
     public void onMessage(String s, MessageEvent messageEvent) throws Exception {
-        LOGGER.info(String.format("Event: %s", messageEvent.getData()));
+        LOGGER.info("📨 Received event: {}", messageEvent.getData().substring(0, Math.min(100, messageEvent.getData().length())));
+
 
         kafkaTemplate.send(topic, messageEvent.getData());
     }
@@ -41,6 +42,6 @@ public class ApiRealTImeChangesHandler implements BackgroundEventHandler {
 
     @Override
     public void onError(Throwable throwable) {
-
+        LOGGER.error("❌❌❌ ERROR in EventSource: {}", throwable.getMessage(), throwable);
     }
 }

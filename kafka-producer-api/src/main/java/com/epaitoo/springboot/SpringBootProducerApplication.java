@@ -7,12 +7,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class SpringBootProducerApplication implements CommandLineRunner {
+
+    @Autowired
+    private ApiRealTImeChangesProducer apiRealTImeChangesProducer;
+
     public static void main(String[] args) {
         SpringApplication.run(SpringBootProducerApplication.class);
     }
 
-    @Autowired
-    private ApiRealTImeChangesProducer apiRealTImeChangesProducer;
 
     @Override
     public void run(String... args) throws Exception {
