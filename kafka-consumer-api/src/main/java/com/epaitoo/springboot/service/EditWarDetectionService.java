@@ -4,8 +4,13 @@ import com.epaitoo.springboot.entity.EditWarAlert;
 import com.epaitoo.springboot.entity.EditWarStatus;
 import com.epaitoo.springboot.entity.PageEditWindow;
 import com.epaitoo.springboot.entity.WikimediaEditEvent;
+import com.epaitoo.springboot.persistence.entity.EditWarAlertEntity;
+import com.epaitoo.springboot.persistence.mapper.AlertMapper;
+import com.epaitoo.springboot.persistence.repository.EditWarAlertRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -17,7 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class EditWarDetectionService {
+
+    // Dependencies
+    private final EditWarAlertRepository alertRepository;
+    private final AlertMapper alertMapper;
+
     // Store edit windows per page (thread-safe)
     private final Map<String, PageEditWindow> pageWindows = new ConcurrentHashMap<>();
 
@@ -25,6 +36,7 @@ public class EditWarDetectionService {
      * Process a new edit event
      * Returns an EditWarAlert if a war is detected, null otherwise
      */
+    @Transactional
     public Optional<EditWarAlert> processEdit(WikimediaEditEvent event) {
         // Skip if null or invalid
         if (event == null || event.getPageTitle() == null) {
@@ -48,8 +60,19 @@ public class EditWarDetectionService {
 
         // Check for edit war
         if (window.isEditWar()) {
-            log.info("\uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8 EDIT WAR DETECTED \uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8🚨 on page: {}", pageKey);
-            return Optional.of(createAlert(window, event.getWiki()));
+            log.info("\uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8 EDIT WAR DETECTED \uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8🚨 " +
+                    "on page: {}", pageKey);
+
+            // Create alert
+            EditWarAlert alert = createAlert(window, event.getWiki());
+
+            // Save to database
+            EditWarAlertEntity entity = alertMapper.toEntity(alert);
+            EditWarAlertEntity savedEntity = alertRepository.save(entity);
+
+            log.info("✅ Alert saved to database with ID: {}", savedEntity.getId());
+
+            return Optional.of(alert);
         }
 
         return Optional.empty();
