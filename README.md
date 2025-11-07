@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # 🚨 Wikipedia Edit War Detection System
 
 A real-time streaming application that detects edit wars on Wikipedia using **Apache Kafka**, **Spring Boot**, and **reactive programming**.
@@ -271,4 +270,3 @@ Eugene Paitoo
 ---
 
 *Note: This is a learning/portfolio project demonstrating real-time stream processing, event-driven architecture, and production-grade Java development practices.*
-EOF
