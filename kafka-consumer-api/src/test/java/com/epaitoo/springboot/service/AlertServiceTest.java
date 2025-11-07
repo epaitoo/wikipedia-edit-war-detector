@@ -253,7 +253,7 @@ class AlertServiceTest {
         verify(alertRepository, times(2)).countByStatus(any());
     }
 
-    // ==================== GET RECENT ALERTS ====================
+    // ===================== GET RECENT ALERTS ====================
 
     @Test
     @DisplayName("Should get recent active alerts")
