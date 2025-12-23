@@ -36,7 +36,7 @@ public class ApiRealTImeChangesProducer {
         LOGGER.info("Building EventSource for URL: {}", url);
 
         Headers headers = new Headers.Builder()
-                .add("User-Agent", "SpringBootKafkaApp/1.0 (eugenepaitoo@gmail.com) EditWarDetector")
+                .add("User-Agent", "SpringBootKafkaApp/1.0 (johnsmith@gmail.com) EditWarDetector")
                 .build();
 
         ConnectStrategy connectStrategy = ConnectStrategy.http(URI.create(url))

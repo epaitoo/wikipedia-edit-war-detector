@@ -1,87 +1,152 @@
-cat > README.md << 'EOF'
 # 🚨 Wikipedia Edit War Detection System
 
-A real-time streaming application that detects edit wars on Wikipedia using **Apache Kafka**, **Spring Boot**, and **reactive programming**.
+A real-time streaming application that detects edit wars on Wikipedia using **Apache Kafka**, **Spring Boot**, **React**, and **Docker**.
 
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-green)
-![Kafka](https://img.shields.io/badge/Apache%20Kafka-3.9-black)
+![Kafka](https://img.shields.io/badge/Apache%20Kafka-KRaft-black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
+![React](https://img.shields.io/badge/React-18-61DAFB)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
 ![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
-![TDD](https://img.shields.io/badge/TDD-100%25%20Coverage-success)
 
 ## 🎯 What It Does
 
 Monitors the [Wikimedia EventStreams API](https://stream.wikimedia.org/v2/stream/recentchange) in real-time and detects patterns indicating **edit wars** - situations where multiple users repeatedly revert each other's changes on the same article.
 
-**Real Detection:** Successfully detected edit war on **Frederick Trump** page with 2 conflicting editors! ✅
+**Real Detection:** Successfully detected edit wars on pages like **Frederick Trump**, **Hans van Manen**, and more! ✅
 
 ## 🏗️ Architecture
+
 ```
-Wikimedia API → Kafka Producer → Kafka Topic → Kafka Consumer → Edit War Detection → PostgreSQL → REST API
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Wikimedia API  │────▶│  Kafka Producer │────▶│   Apache Kafka  │
+└─────────────────┘     └─────────────────┘     └────────┬────────┘
+                                                         │
+                                                         ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  React Frontend │◀────│    REST API     │◀────│  Kafka Consumer │
+└─────────────────┘     └─────────────────┘     └────────┬────────┘
+                                                         │
+                                                         ▼
+                                                ┌─────────────────┐
+                                                │   PostgreSQL    │
+                                                └─────────────────┘
 ```
 
 ### Components
 
-1. **kafka-producer-api**: Streams real-time Wikipedia edits to Kafka
-2. **kafka-consumer-api**: Consumes events, detects edit wars, exposes REST API
+| Component | Description |
+|-----------|-------------|
+| **kafka-producer-api** | Streams real-time Wikipedia edits to Kafka |
+| **kafka-consumer-api** | Consumes events, detects edit wars, exposes REST API |
+| **React Frontend** | Dashboard displaying real-time alerts (separate repo) |
 
 ### Technologies
 
 - **Spring Boot 3.5.6** - Application framework
-- **Apache Kafka 3.9** - Event streaming platform
+- **Apache Kafka (KRaft)** - Event streaming (no ZooKeeper required)
 - **Spring WebFlux** - Reactive programming & Server-Sent Events
 - **PostgreSQL 15** - Database persistence
 - **Spring Data JPA** - ORM with Hibernate
-- **Spring Data JPA Repositories** - Data access layer
+- **React 18 + TypeScript** - Frontend dashboard
+- **Docker & Docker Compose** - Containerization
 - **JUnit 5 & Mockito** - Testing with TDD approach
-- **Maven** - Build tool
-- **Project Lombok** - Boilerplate reduction
 
-## 🔍 Edit War Detection Algorithm
+## 🚀 Quick Start with Docker
 
-### Criteria
+The fastest way to run the entire stack:
 
-An edit war is detected when:
-- ✅ **5+ edits** on the same article within 1 hour
-- ✅ **2-3 distinct human editors** (bots excluded)
-- ✅ **Main namespace only** (articles, not talk pages)
-- ✅ **50%+ conflict ratio** (reverts or opposing changes)
+### Prerequisites
 
-### Conflict Types
+- **Docker** and **Docker Compose** installed
+- **Git**
 
-1. **Pure Reverts**: Edit returns article to a previous length
-2. **Opposing Edits**: One user adds content, another removes it
+### 1. Clone and Configure
 
-### Why Real Alerts Are Rare
+```bash
+# Clone repository
+git clone https://github.com/YOUR_USERNAME/springboot-kafka-realtime.git
+cd springboot-kafka-realtime
 
-Edit wars occur in only ~0.01% of all edits. Most Wikipedia activity consists of collaborative editing, making our successful detection of real edit wars particularly significant!
+# Create environment file
+cp .env.example .env
 
-## 🚀 Getting Started
+# (Optional) Edit .env to change database credentials
+```
+
+### 2. Start Everything
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Or run in background
+docker-compose up --build -d
+```
+
+This starts:
+- ✅ **PostgreSQL** - Database with schema auto-initialized
+- ✅ **Apache Kafka** - Message broker (KRaft mode)
+- ✅ **Producer** - Streams Wikipedia events to Kafka
+- ✅ **Consumer** - Detects edit wars, serves REST API on port 8081
+
+### 3. Verify It's Working
+
+```bash
+# Check all containers are running
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+
+# Test the API
+curl http://localhost:8081/api/health | jq
+curl http://localhost:8081/api/stats | jq
+curl http://localhost:8081/api/alerts | jq
+```
+
+### 4. Stop Everything
+
+```bash
+docker-compose down
+
+# To also remove the database volume (fresh start)
+docker-compose down -v
+```
+
+## 🖥️ Local Development (Without Docker)
+
+If you prefer running services locally:
 
 ### Prerequisites
 
 - **Java 21+**
-- **Apache Kafka 3.9+** (KRaft mode)
+- **Apache Kafka 3.8+** (KRaft mode)
 - **PostgreSQL 15+**
 - **Maven 3.8+**
 
 ### Database Setup
+
 ```bash
 # Create database and user
 psql -U postgres
 CREATE DATABASE editwars_detection;
 CREATE USER editwar_user WITH PASSWORD 'your_password';
 GRANT ALL PRIVILEGES ON DATABASE editwars_detection TO editwar_user;
+\c editwars_detection
+# Run the schema migration
+\i kafka-consumer-api/src/main/resources/db/migration/V1__init_schema.sql
 \q
 ```
 
-### Kafka Setup
+### Kafka Setup (KRaft Mode)
+
 ```bash
 # Download and extract Kafka
-wget https://downloads.apache.org/kafka/3.9.0/kafka_2.13-3.9.0.tgz
-tar -xzf kafka_2.13-3.9.0.tgz
-cd kafka_2.13-3.9.0
+wget https://downloads.apache.org/kafka/3.8.0/kafka_2.13-3.8.0.tgz
+tar -xzf kafka_2.13-3.8.0.tgz
+cd kafka_2.13-3.8.0
 
 # Generate cluster ID and format storage (first time only)
 KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
@@ -92,17 +157,10 @@ bin/kafka-server-start.sh config/kraft/server.properties
 ```
 
 ### Application Setup
-```bash
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/springboot-kafka-realtime.git
-cd springboot-kafka-realtime
 
+```bash
 # Build project
 ./mvnw clean install
-
-# Configure database connection
-# Edit kafka-consumer-api/src/main/resources/application.properties
-# Update: spring.datasource.url, username, password
 
 # Start Consumer (in one terminal)
 cd kafka-consumer-api
@@ -129,27 +187,54 @@ Base URL: `http://localhost:8081/api`
 | GET | `/alerts/recent` | Recent active alerts |
 | POST | `/test/simulate-edit-war` | Simulate test data |
 
-### Example Usage
-```bash
-# Health check
-curl http://localhost:8081/api/health | jq
+### Example Responses
 
+```bash
 # Get statistics
 curl http://localhost:8081/api/stats | jq
+{
+  "totalAlerts": 12,
+  "activeAlerts": 12,
+  "resolvedAlerts": 0
+}
 
-# Get all alerts
-curl http://localhost:8081/api/alerts | jq
-
-# Search for specific topic
+# Search for alerts
 curl "http://localhost:8081/api/alerts/search?q=trump" | jq
 
-# Simulate test data
-curl -X POST http://localhost:8081/api/test/simulate-edit-war | jq
+# Get high severity alerts
+curl http://localhost:8081/api/alerts/severity/HIGH | jq
 ```
+
+## 🔍 Edit War Detection Algorithm
+
+### Criteria
+
+An edit war is detected when:
+- ✅ **5+ edits** on the same article within 1 hour
+- ✅ **2-3 distinct human editors** (bots excluded)
+- ✅ **Main namespace only** (articles, not talk pages)
+- ✅ **50%+ conflict ratio** (reverts or opposing changes)
+
+### Conflict Types
+
+| Type | Description |
+|------|-------------|
+| **Pure Reverts** | Edit returns article to a previous length |
+| **Opposing Edits** | One user adds content, another removes it |
+
+### Severity Levels
+
+| Level | Score | Description |
+|-------|-------|-------------|
+| CRITICAL | ≥0.8 | Intense, rapid conflict |
+| HIGH | ≥0.6 | Significant edit war |
+| MEDIUM | ≥0.4 | Moderate conflict |
+| LOW | <0.4 | Minor disagreement |
 
 ## 🧪 Testing
 
-**Test-Driven Development (TDD) approach** with 100% coverage of critical paths:
+**Test-Driven Development (TDD) approach** with comprehensive coverage:
+
 ```bash
 # Run all tests
 ./mvnw test
@@ -158,6 +243,7 @@ curl -X POST http://localhost:8081/api/test/simulate-edit-war | jq
 ./mvnw test -Dtest=AlertServiceTest
 ./mvnw test -Dtest=AlertControllerTest
 ./mvnw test -Dtest=EditWarDetectionServiceTest
+./mvnw test -Dtest=PageEditWindowTest
 ```
 
 ### Test Coverage
@@ -165,32 +251,72 @@ curl -X POST http://localhost:8081/api/test/simulate-edit-war | jq
 - ✅ Unit tests for services, repositories, mappers
 - ✅ Integration tests with H2 in-memory database
 - ✅ REST API tests with WebTestClient
-- ✅ Mock-based isolation testing
+- ✅ Edit war detection algorithm tests
 
 ## 📊 Project Structure
+
 ```
 springboot-kafka-realtime/
-├── kafka-producer-api/              # Wikimedia → Kafka producer
-│   ├── ApiRealTimeChangesProducer   # SSE client
-│   ├── ApiRealTimeChangesHandler    # Event handler
-│   └── KafkaTopicConfig             # Topic configuration
-├── kafka-consumer-api/              # Kafka → Processing → API
-│   ├── entity/                      # Domain models
-│   │   ├── EditWarAlert
-│   │   ├── WikimediaEditEvent
-│   │   └── PageEditWindow
-│   ├── persistence/                 # Database layer
-│   │   ├── entity/                  # JPA entities
-│   │   ├── repository/              # Spring Data repos
-│   │   └── mapper/                  # Domain ↔ Entity mappers
-│   ├── service/                     # Business logic
-│   │   ├── EditWarDetectionService
-│   │   ├── AlertService
-│   │   └── WikimediaEventParser
-│   └── controller/                  # REST endpoints
-│       ├── AlertController
-│       └── TestDataController
+├── docker-compose.yml           # Container orchestration
+├── .env.example                 # Environment template
+├── kafka-producer-api/          # Wikimedia → Kafka
+│   ├── Dockerfile
+│   ├── src/main/java/.../
+│   │   ├── ApiRealTimeChangesProducer.java
+│   │   ├── ApiRealTimeChangesHandler.java
+│   │   └── KafkaTopicConfig.java
+│   └── src/main/resources/
+│       ├── application.properties
+│       └── application-docker.properties
+├── kafka-consumer-api/          # Kafka → Detection → API
+│   ├── Dockerfile
+│   ├── src/main/java/.../
+│   │   ├── controller/          # REST endpoints
+│   │   ├── service/             # Business logic
+│   │   ├── entity/              # Domain models
+│   │   └── persistence/         # Database layer
+│   └── src/main/resources/
+│       ├── application.properties
+│       ├── application-docker.properties
+│       └── db/migration/        # SQL schemas
 └── README.md
+```
+
+## 🐳 Docker Configuration
+
+### Services
+
+| Service | Image | Port | Description |
+|---------|-------|------|-------------|
+| postgres | postgres:15-alpine | 5433:5432 | Database |
+| kafka | apache/kafka:latest | 9092:9092 | Message broker |
+| producer | Custom build | - | Wikimedia streamer |
+| consumer | Custom build | 8081:8081 | API server |
+
+### Environment Variables
+
+Create a `.env` file (see `.env.example`):
+
+```env
+POSTGRES_DB=editwars_detection
+POSTGRES_USER=editwar_user
+POSTGRES_PASSWORD=your_secure_password
+```
+
+### Useful Commands
+
+```bash
+# View logs for specific service
+docker-compose logs -f consumer
+
+# Rebuild single service
+docker-compose up --build consumer
+
+# Access PostgreSQL
+docker exec -it editwars-postgres psql -U editwar_user -d editwars_detection
+
+# Check Kafka topics
+docker exec -it editwars-kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 ```
 
 ## 🎯 Key Features
@@ -200,22 +326,53 @@ springboot-kafka-realtime/
 - ✅ **Reactive architecture** - Non-blocking I/O with Spring WebFlux
 - ✅ **Database persistence** - PostgreSQL with JPA/Hibernate
 - ✅ **RESTful API** - Comprehensive endpoints with pagination
+- ✅ **Containerized** - One-command deployment with Docker Compose
 - ✅ **Test-driven** - Extensive test coverage
-- ✅ **Production-ready** - Error handling, logging, monitoring
+- ✅ **Production-ready** - Error handling, logging, health checks
 
-## 🏆 Achievements
+## 🐛 Troubleshooting
 
-- 🎯 Successfully detected real edit war on **Frederick Trump** Wikipedia page
-- ✅ Processed 1000+ Wikipedia edits in real-time
-- ✅ 100% test coverage on critical business logic
-- ✅ Clean architecture with separation of concerns
-- ✅ Scalable event-driven design
+### Port already in use?
 
+```bash
+# PostgreSQL conflict (if running locally)
+# Change docker-compose.yml: "5433:5432" instead of "5432:5432"
 
+# Or stop local PostgreSQL
+sudo systemctl stop postgresql
+```
+
+### No events appearing?
+
+```bash
+# Check producer logs
+docker-compose logs -f producer
+
+# Verify Kafka is receiving messages
+docker exec -it editwars-kafka /opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic wikimedia-stream-api \
+  --from-beginning
+```
+
+### Database schema issues?
+
+```bash
+# Reset database (removes all data)
+docker-compose down -v
+docker-compose up --build
+```
+
+### No alerts appearing?
+
+This is normal! Real edit wars are rare (~0.01% of edits). Use test endpoints:
+```bash
+curl -X POST http://localhost:8081/api/test/simulate-edit-war | jq
+```
 
 ## 📝 Technical Highlights
 
-### Design Patterns Used
+### Design Patterns
 - Repository Pattern (data access)
 - Mapper Pattern (DTO conversion)
 - Observer Pattern (event-driven)
@@ -229,24 +386,9 @@ springboot-kafka-realtime/
 
 ### Best Practices
 - Test-Driven Development (TDD)
-- Reactive Programming
-- RESTful API design
-- Database indexing strategies
-
-## 🐛 Troubleshooting
-
-### No events appearing?
-- Check Kafka is running: `jps | grep Kafka`
-- Verify topic exists: `kafka-topics.sh --list --bootstrap-server localhost:9092`
-- Check producer connection logs
-
-### No alerts appearing?
-- This is normal! Real edit wars are rare (~0.01% of edits)
-- Use test endpoints: `POST /api/test/simulate-edit-war`
-
-### Database connection issues?
-- Verify PostgreSQL is running: `sudo systemctl status postgresql`
-- Check credentials in `application.properties`
+- Spring Profiles for environment configuration
+- Docker multi-stage builds
+- Health checks for container orchestration
 
 ## 📄 License
 
@@ -254,21 +396,12 @@ MIT License - See LICENSE file for details
 
 ## 👤 Author
 
-Eugene Paitoo
+**Eugene Paitoo**
 
 [LinkedIn](https://www.linkedin.com/in/eugene-paitoo/)
-
-## 🙏 Acknowledgments
-
-- Wikimedia Foundation for providing the EventStreams API
-- Spring/Apache Kafka communities
-- Built with Test-Driven Development methodology
 
 ---
 
 **⭐ Star this repo if you find it useful!**
 
----
-
-*Note: This is a learning/portfolio project demonstrating real-time stream processing, event-driven architecture, and production-grade Java development practices.*
-EOF
+*This project demonstrates real-time stream processing, event-driven architecture, containerization, and production-grade Java development practices.*
