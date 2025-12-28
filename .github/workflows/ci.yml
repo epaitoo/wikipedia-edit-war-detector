@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -59,3 +59,22 @@ jobs:
 
       - name: Build Consumer Docker Image
         run: docker build -t editwars-consumer -f ./kafka-consumer-api/Dockerfile .
+
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/editwars-backend
+            git pull origin main
+            docker compose down
+            docker compose up --build -d
+            docker system prune -f
