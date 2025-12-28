@@ -9,6 +9,7 @@ A real-time streaming application that detects edit wars on Wikipedia using **Ap
 ![React](https://img.shields.io/badge/React-18-61DAFB)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
 ![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
+![CI](https://github.com/epaitoo/wikipedia-edit-war-detector/actions/workflows/ci.yml/badge.svg)
 
 ## 🎯 What It Does
 
