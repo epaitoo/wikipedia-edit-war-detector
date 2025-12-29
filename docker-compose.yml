@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: editwars-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -21,6 +22,7 @@ services:
     image: apache/kafka:latest
     hostname: kafka
     container_name: editwars-kafka
+    restart: unless-stopped
     ports:
       - "9092:9092"
     environment:
@@ -49,6 +51,7 @@ services:
       context: .
       dockerfile: kafka-producer-api/Dockerfile
     container_name: editwars-producer
+    restart: unless-stopped
     depends_on:
       kafka:
         condition: service_healthy
@@ -60,6 +63,7 @@ services:
       context: .
       dockerfile: kafka-consumer-api/Dockerfile
     container_name: editwars-consumer
+    restart: unless-stopped
     ports:
       - "8081:8081"
     depends_on:
