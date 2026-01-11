@@ -25,5 +25,5 @@ ENV SPRING_PROFILES_ACTIVE=docker
 
 COPY --from=build /app/kafka-consumer-api/target/*.jar app.jar
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]
 
