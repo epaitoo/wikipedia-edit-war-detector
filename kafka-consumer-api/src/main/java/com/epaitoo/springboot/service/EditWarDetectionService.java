@@ -60,8 +60,7 @@ public class EditWarDetectionService {
 
         // Check for edit war
         if (window.isEditWar()) {
-            log.info("\uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8 EDIT WAR DETECTED \uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8🚨 " +
-                    "on page: {}", pageKey);
+            log.info("EDIT WAR DETECTED on page: {}", pageKey);
 
             // Create alert
             EditWarAlert alert = createAlert(window, event.getWiki());
@@ -70,7 +69,7 @@ public class EditWarDetectionService {
             EditWarAlertEntity entity = alertMapper.toEntity(alert);
             EditWarAlertEntity savedEntity = alertRepository.save(entity);
 
-            log.info("✅ Alert saved to database with ID: {}", savedEntity.getId());
+            log.info("Alert saved to database with ID: {}", savedEntity.getId());
 
             return Optional.of(alert);
         }

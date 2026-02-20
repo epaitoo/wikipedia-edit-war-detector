@@ -26,7 +26,7 @@ public class ApiRealTImeChangesProducer {
 
 
     public void sendMessage() throws InterruptedException {
-        LOGGER.info("🚀\uD83D\uDE80 STARTING TO CONNECT TO WIKIMEDIA...");
+        LOGGER.info("STARTING TO CONNECT TO WIKIMEDIA...");
 
         String topic = "wikimedia-stream-api";
         String url = "https://stream.wikimedia.org/v2/stream/recentchange";
@@ -55,7 +55,7 @@ public class ApiRealTImeChangesProducer {
         backgroundEventSource.start();
 
 
-        LOGGER.info("✅ EventSource started! Listening for Wikimedia events for 8 minutes...");
+        LOGGER.info("EventSource started! Listening for Wikimedia events for 8 minutes...");
         LOGGER.info("If you don't see events, check:");
         LOGGER.info("  1. Internet connection");
         LOGGER.info("  2. Wikimedia URL is accessible: {}", url);

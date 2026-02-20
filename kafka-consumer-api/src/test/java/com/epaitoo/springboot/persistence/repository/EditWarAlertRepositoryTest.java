@@ -43,7 +43,7 @@ public class EditWarAlertRepositoryTest {
         // Save
         EditWarAlertEntity saved = repository.save(alert);
         assertNotNull(saved.getId());
-        System.out.println("✅ Saved with ID: " + saved.getId());
+        System.out.println("Saved with ID: " + saved.getId());
 
         // Find
         EditWarAlertEntity found = repository.findById(saved.getId()).orElse(null);
@@ -51,6 +51,6 @@ public class EditWarAlertRepositoryTest {
         assertEquals("Test_Article", found.getPageTitle());
         assertEquals(SeverityLevel.HIGH, found.getSeverityLevel());
         assertEquals(new BigDecimal("0.75"), found.getSeverityScore());
-        System.out.println("✅ Found: " + found.getPageTitle());
+        System.out.println("Found: " + found.getPageTitle());
     }
 }

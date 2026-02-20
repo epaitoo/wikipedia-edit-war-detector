@@ -1,4 +1,4 @@
-# 🚨 Wikipedia Edit War Detection System
+# Wikipedia Edit War Detection System
 
 A real-time streaming application that detects edit wars on Wikipedia using **Apache Kafka**, **Spring Boot**, **React**, and **Docker**.
 
@@ -11,13 +11,13 @@ A real-time streaming application that detects edit wars on Wikipedia using **Ap
 ![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
 ![CI](https://github.com/epaitoo/wikipedia-edit-war-detector/actions/workflows/ci.yml/badge.svg)
 
-## 🎯 What It Does
+## What It Does
 
 Monitors the [Wikimedia EventStreams API](https://stream.wikimedia.org/v2/stream/recentchange) in real-time and detects patterns indicating **edit wars** - situations where multiple users repeatedly revert each other's changes on the same article.
 
-**Real Detection:** Successfully detected edit wars on pages like **Frederick Trump**, **Hans van Manen**, and more! ✅
+**Real Detection:** Successfully detected edit wars on pages like **Frederick Trump**, **Hans van Manen**, and more!
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -54,7 +54,7 @@ Monitors the [Wikimedia EventStreams API](https://stream.wikimedia.org/v2/stream
 - **Docker & Docker Compose** - Containerization
 - **JUnit 5 & Mockito** - Testing with TDD approach
 
-## 🚀 Quick Start with Docker
+## Quick Start with Docker
 
 The fastest way to run the entire stack:
 
@@ -87,10 +87,10 @@ docker-compose up --build -d
 ```
 
 This starts:
-- ✅ **PostgreSQL** - Database with schema auto-initialized
-- ✅ **Apache Kafka** - Message broker (KRaft mode)
-- ✅ **Producer** - Streams Wikipedia events to Kafka
-- ✅ **Consumer** - Detects edit wars, serves REST API on port 8081
+- **PostgreSQL** - Database with schema auto-initialized
+- **Apache Kafka** - Message broker (KRaft mode)
+- **Producer** - Streams Wikipedia events to Kafka
+- **Consumer** - Detects edit wars, serves REST API on port 8081
 
 ### 3. Verify It's Working
 
@@ -116,7 +116,7 @@ docker-compose down
 docker-compose down -v
 ```
 
-## 🖥️ Local Development (Without Docker)
+## Local Development (Without Docker)
 
 If you prefer running services locally:
 
@@ -172,7 +172,7 @@ cd kafka-producer-api
 ../mvnw spring-boot:run
 ```
 
-## 📡 REST API Endpoints
+## REST API Endpoints
 
 Base URL: `http://localhost:8081/api`
 
@@ -206,15 +206,15 @@ curl "http://localhost:8081/api/alerts/search?q=trump" | jq
 curl http://localhost:8081/api/alerts/severity/HIGH | jq
 ```
 
-## 🔍 Edit War Detection Algorithm
+## Edit War Detection Algorithm
 
 ### Criteria
 
 An edit war is detected when:
-- ✅ **5+ edits** on the same article within 1 hour
-- ✅ **2-3 distinct human editors** (bots excluded)
-- ✅ **Main namespace only** (articles, not talk pages)
-- ✅ **50%+ conflict ratio** (reverts or opposing changes)
+- **5+ edits** on the same article within 1 hour
+- **2-3 distinct human editors** (bots excluded)
+- **Main namespace only** (articles, not talk pages)
+- **50%+ conflict ratio** (reverts or opposing changes)
 
 ### Conflict Types
 
@@ -232,7 +232,7 @@ An edit war is detected when:
 | MEDIUM | ≥0.4 | Moderate conflict |
 | LOW | <0.4 | Minor disagreement |
 
-## 🧪 Testing
+## Testing
 
 **Test-Driven Development (TDD) approach** with comprehensive coverage:
 
@@ -249,12 +249,12 @@ An edit war is detected when:
 
 ### Test Coverage
 
-- ✅ Unit tests for services, repositories, mappers
-- ✅ Integration tests with H2 in-memory database
-- ✅ REST API tests with WebTestClient
-- ✅ Edit war detection algorithm tests
+- Unit tests for services, repositories, mappers
+- Integration tests with H2 in-memory database
+- REST API tests with WebTestClient
+- Edit war detection algorithm tests
 
-## 📊 Project Structure
+## Project Structure
 
 ```
 springboot-kafka-realtime/
@@ -283,7 +283,7 @@ springboot-kafka-realtime/
 └── README.md
 ```
 
-## 🐳 Docker Configuration
+## Docker Configuration
 
 ### Services
 
@@ -320,18 +320,18 @@ docker exec -it editwars-postgres psql -U editwar_user -d editwars_detection
 docker exec -it editwars-kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 ```
 
-## 🎯 Key Features
+## Key Features
 
-- ✅ **Real-time processing** - Processes Wikipedia edits as they happen
-- ✅ **Pattern recognition** - Sophisticated conflict detection algorithm
-- ✅ **Reactive architecture** - Non-blocking I/O with Spring WebFlux
-- ✅ **Database persistence** - PostgreSQL with JPA/Hibernate
-- ✅ **RESTful API** - Comprehensive endpoints with pagination
-- ✅ **Containerized** - One-command deployment with Docker Compose
-- ✅ **Test-driven** - Extensive test coverage
-- ✅ **Production-ready** - Error handling, logging, health checks
+- **Real-time processing** - Processes Wikipedia edits as they happen
+- **Pattern recognition** - Sophisticated conflict detection algorithm
+- **Reactive architecture** - Non-blocking I/O with Spring WebFlux
+- **Database persistence** - PostgreSQL with JPA/Hibernate
+- **RESTful API** - Comprehensive endpoints with pagination
+- **Containerized** - One-command deployment with Docker Compose
+- **Test-driven** - Extensive test coverage
+- **Production-ready** - Error handling, logging, health checks
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Port already in use?
 
@@ -371,7 +371,7 @@ This is normal! Real edit wars are rare (~0.01% of edits). Use test endpoints:
 curl -X POST http://localhost:8081/api/test/simulate-edit-war | jq
 ```
 
-## 📝 Technical Highlights
+## Technical Highlights
 
 ### Design Patterns
 - Repository Pattern (data access)
@@ -391,11 +391,11 @@ curl -X POST http://localhost:8081/api/test/simulate-edit-war | jq
 - Docker multi-stage builds
 - Health checks for container orchestration
 
-## 📄 License
+## License
 
 MIT License - See LICENSE file for details
 
-## 👤 Author
+## Author
 
 **Eugene Paitoo**
 
@@ -403,6 +403,6 @@ MIT License - See LICENSE file for details
 
 ---
 
-**⭐ Star this repo if you find it useful!**
+**Star this repo if you find it useful!**
 
 *This project demonstrates real-time stream processing, event-driven architecture, containerization, and production-grade Java development practices.*

@@ -18,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TestDataController {
     private final EditWarDetectionService detectionService;
-    private final AlertEventPublisher eventPublisher; // ✨ Inject publisher
+    private final AlertEventPublisher eventPublisher;
 
     @PostMapping("/simulate-edit-war")
     public Map<String, Object> simulateEditWar() {
@@ -31,19 +31,19 @@ public class TestDataController {
 
         // Simulate classic reverting pattern
         detectionService.processEdit(createTestEdit(testPage, "Alice", 5000, 5500, now));
-        log.info("  ➡️ Edit 1: Alice adds 500 bytes");
+        log.info("  Edit 1: Alice adds 500 bytes");
 
         detectionService.processEdit(createTestEdit(testPage, "Bob", 5500, 5000, now + 180));
-        log.info("  ⬅️ Edit 2: Bob reverts (-500 bytes)");
+        log.info("  Edit 2: Bob reverts (-500 bytes)");
 
         detectionService.processEdit(createTestEdit(testPage, "Alice", 5000, 5500, now + 360));
-        log.info("  ➡️ Edit 3: Alice reverts back (+500 bytes)");
+        log.info("  Edit 3: Alice reverts back (+500 bytes)");
 
         detectionService.processEdit(createTestEdit(testPage, "Bob", 5500, 5000, now + 540));
-        log.info("  ⬅️ Edit 4: Bob reverts again (-500 bytes)");
+        log.info("  Edit 4: Bob reverts again (-500 bytes)");
 
         alert = detectionService.processEdit(createTestEdit(testPage, "Alice", 5000, 5500, now + 720));
-        log.info("  ➡️ Edit 5: Alice reverts one more time (+500 bytes)");
+        log.info("  Edit 5: Alice reverts one more time (+500 bytes)");
 
         // Build response
         Map<String, Object> response = new HashMap<>();
@@ -58,14 +58,14 @@ public class TestDataController {
             response.put("alertTriggered", true);
             response.put("severity", warAlert.getSeverityLevel());
             response.put("conflictRatio", String.format("%.0f%%", warAlert.getConflictRatio() * 100));
-            log.info("🚨 ALERT TRIGGERED! Severity: {}", warAlert.getSeverityLevel());
+            log.info("ALERT TRIGGERED! Severity: {}", warAlert.getSeverityLevel());
 
             // Publish through event publisher
             eventPublisher.publishAlert(warAlert);
 
         } else {
             response.put("alertTriggered", false);
-            log.warn("⚠️ No alert triggered (check detection criteria)");
+            log.warn("No alert triggered (check detection criteria)");
         }
 
         return response;
